@@ -9,10 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RecipesCreationSchema } from '@/schemas/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import { z } from "zod";
-
+import axios from "axios";
 
 type ReceipesInput = z.infer<typeof RecipesCreationSchema>;
 
@@ -81,11 +81,17 @@ const CreateRecipesPage = () => {
     const onSubmit = async (values: ReceipesInput) => {
 
         console.log(values);
+
+        const response  = await axios.post("/api/create-recipes",values);
+        console.log(response.data)
     }
 
-    form.setValue('cookingTime',cookValue);
-    form.setValue('numberOfIngredients',numberValue);
-    form.setValue('levelOfDifficulty',levelValue);
+    useEffect(() => {
+        // Set form values when the dependent values change
+        form.setValue('cookingTime', cookValue);
+        form.setValue('numberOfIngredients', numberValue);
+        form.setValue('levelOfDifficulty', levelValue);
+    }, [form, cookValue, numberValue, levelValue]);
 
     return (
         <div className='absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 '>
@@ -100,7 +106,7 @@ const CreateRecipesPage = () => {
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
                             <FormField
                                 control={form.control}
                                 name='theme'
@@ -141,7 +147,7 @@ const CreateRecipesPage = () => {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
-                                            Key Ingredients - Optional
+                                            Restictions - Optional
                                         </FormLabel>
                                         <FormControl>
                                             <Input placeholder='Gluten-free,dairy-free,vegetratian,vegan,nut-free,' {...field} />
